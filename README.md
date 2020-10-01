@@ -96,6 +96,14 @@ INFO:ESP32:Could not connect to the WiFi network
 
 ![Prototype](images/prototype.jpg)
 
+
+## Dashboard
+
+The data collected by the esp-sensor is sent to the Adafruit MQTT
+service. This is a picture of the dashboard for this esp-sensor.
+
+![Prototype](images/dashboard.png)
+
 ## Misc
 
 Links for more information on the tools I am using:
