@@ -95,3 +95,12 @@ INFO:ESP32:Could not connect to the WiFi network
 ## Picture of the development prototype
 
 ![Prototype](images/prototype.jpg)
+
+## Misc
+
+Links for more information on the tools I am using:
+
+  - https://www.gnu.org/software/screen/screen.html
+  - https://micropython.org
+  - https://docs.wemos.cc/en/latest/d1/d1_mini.html
+  - https://ae-bst.resource.bosch.com/media/_tech/media/product_flyer/BST-BME280-FL000.pdf
