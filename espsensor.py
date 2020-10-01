@@ -19,7 +19,7 @@ from umqtt.robust import MQTTClient
 
 WIDTH = 128
 HEIGHT = 64
-TOPIC = b'/'.join([wc.IO_USERNAME, b'feeds/esp12_{:s}'])
+TOPIC = bytes('/'.join([wc.IO_USERNAME, 'feeds/esp12_{:s}']), 'utf-8')
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("ESP32")
@@ -170,13 +170,13 @@ def splash_screen(oled):
   time.sleep(1.5)
   oled.fill(0)
   oled.text('WIFI', 0, 5)
-  oled.text(wc.SSID.decode(), 0, 20)
+  oled.text(wc.SSID, 0, 20)
   oled.text('Connecting...', 0, 35)
   oled.show()
 
 def main():
   print("\n")
-  LOG.info('Temphumi starting')
+  LOG.info('ESPSensor starting')
   i2c = I2C(-1, scl=Pin(5), sda=Pin(4))
   oled = ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c)
   splash_screen(oled)

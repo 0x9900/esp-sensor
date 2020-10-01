@@ -1,3 +1,5 @@
+#
+import time
 
 try:
   import espsensor
@@ -7,5 +9,5 @@ else:
   try:
     espsensor.main()
   except OSError:
-    time.sleep(10)
-    machine.soft_reset()
+    time.sleep(900)
+    machine.reset()
