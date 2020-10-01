@@ -1,3 +1,5 @@
+import bme280
+
 
 import json
 import logging
@@ -9,7 +11,6 @@ import time
 import uasyncio as asyncio
 import wificonfig as wc
 
-from bmp085 import BMP180
 from machine import I2C
 from machine import Pin
 from machine import reset
@@ -85,16 +86,16 @@ async def heartbeat():
 
 class Sensor:
   def __init__(self, i2c):
-    self._bmp = BMP180(i2c)
-    self._bmp.oversample = 2
-    self._bmp.sealevel = 101225
+    self._bme = bme280.BME280(i2c=i2c)
+    self._bme.oversample = 2
+    self._bme.sealevel = 101225
 
   def fields(self):
-    return ['temp', 'altitude', 'pressure']
+    return ['temp', 'humidity', 'pressure']
 
   def to_dict(self):
-    return dict(temp=self._bmp.temperature, altitude=self._bmp.altitude,
-                pressure=self._bmp.pressure)
+    return dict(temp=self._bme.temperature, humidity=self._bme.humidity,
+                pressure=self._bme.pressure)
 
   def to_json(self):
     return bytes(json.dumps(self.to_dict()), 'utf-8')

@@ -28,15 +28,16 @@ save it into wificonfig.py
 
 ```
 ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 mkdir lib
-ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put lib/bmp085.py lib/bmp085.py
+ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put lib/bme280.py lib/bme280.py
 ```
 
 ### Install the rest of the files
 
 ```
 ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put wificonfig.py
-ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put main.py
 ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put espsensor.py
+ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put main.py
+ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put boot.py
 ```
 
 ## Running
