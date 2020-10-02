@@ -16,7 +16,7 @@ I2C bus.
 This project has been developed using the programming language Python,
 or to be exact micropython. For more information on micropython and
 how to flash micropython on your ESP8266. You can refer to the web
-site for this project at [https://micropython.org/]
+site for this project at https://micropython.org/
 
 Once the micro controller is running micropython you can install the
 esp-sensor's files.
@@ -113,3 +113,7 @@ Links for more information on the tools I am using:
   - https://micropython.org
   - https://docs.wemos.cc/en/latest/d1/d1_mini.html
   - https://ae-bst.resource.bosch.com/media/_tech/media/product_flyer/BST-BME280-FL000.pdf
+
+The live dashboard can be seen here:
+
+  - https://io.adafruit.com/W6BSD/dashboards/esp12
