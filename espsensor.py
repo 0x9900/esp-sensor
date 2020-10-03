@@ -22,7 +22,7 @@ WIDTH = 128
 HEIGHT = 64
 TOPIC = bytes('/'.join([wc.IO_USERNAME, 'feeds/esp12_{:s}']), 'utf-8')
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger("ESP32")
 
 class Network:
@@ -56,6 +56,7 @@ class Network:
       time.sleep(.5)
     else:
       LOG.info('Could not connect to the WiFi network')
+      raise IOError('Network connection error')
 
   def isconnected(self):
     return self.sta_if.isconnected()
@@ -63,17 +64,9 @@ class Network:
   def disconnect(self):
     self.sta_if.disconnect()
 
-async def timesync():
-  network = Network()
-  while True:
-    try:
-      ntptime.settime()
-    except OSError as err:
-      LOG.warning('timesync: %s', err)
-      wait_time = 300
-    else:
-      wait_time = 3600 * 24
-    await asyncio.sleep(wait_time)
+  def ipaddr(self):
+    if_config = self.sta_if.ifconfig()
+    return if_config[0]
 
 async def heartbeat():
   speed = 125
@@ -123,14 +116,16 @@ class MQTTData:
 
   async def check_msg(self):
     while True:
+      LOG.debug('MQTT check message')
       self.client.check_msg()
       await asyncio.sleep_ms(5000)
 
   def publish(self, sensor):
+    LOG.debug('MQTT publish')
+    LOG.debug("MQTT sensor data %r", sensor.to_dict())
     for key, value in sensor.to_dict().items():
       topic = TOPIC.format(bytes(key, 'utf-8'))
       self.client.publish(topic, bytes(str(value), 'utf-8'))
-      LOG.debug("%s: %s", key, value)
 
   @staticmethod
   def buttons_cb(topic, value):
@@ -154,14 +149,17 @@ class DisplayData:
     self.scr = scr
 
   async def run(self, sensor):
+    network = Network()
     while True:
       self.scr.fill(0)
-      self.scr.hline(0, 2, WIDTH, 1)
       data = sensor.to_dict()
+      LOG.debug('DisplayData %r', data)
       for idx, field in enumerate(sensor.fields()):
         line = "{}: {:.1f}".format(field, data[field])
-        self.scr.text(line, 0, 16 + idx * 14)
-      self.scr.hline(0, 63, WIDTH, 1)
+        self.scr.text(line, 0, 5 + idx * 13)
+      self.scr.hline(0, 51, WIDTH, 1)
+      if network.isconnected():
+        self.scr.text(network.ipaddr(), 0, 53)
       self.scr.show()
       await asyncio.sleep(10)
 
@@ -182,13 +180,14 @@ def main():
   oled = ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c)
   splash_screen(oled)
 
-  network = Network()
-  network.connect(wc.SSID, wc.PASSWORD)
-  if not network.isconnected():
+  try:
+    network = Network()
+    network.connect(wc.SSID, wc.PASSWORD)
+  except IOError as err:
     oled.fill(0)
     oled.text('WiFi ERROR', 20, 35)
     oled.show()
-    raise OSError('Connection failed')
+    raise
 
   time.sleep(2)
   oled.fill(0)
@@ -199,7 +198,6 @@ def main():
   display = DisplayData(oled)
 
   loop = asyncio.get_event_loop()
-  loop.create_task(timesync())
   loop.create_task(heartbeat())
   loop.create_task(display.run(sensor))
   loop.create_task(publisher.run(sensor))
