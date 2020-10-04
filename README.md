@@ -90,6 +90,22 @@ The image below is an example of a dashboard that I have built on Adafruit using
 
 ![Prototype](images/dashboard.png)
 
+## Advanced developers
+
+Python is an interpreted language. Each instruction in your program is translated into CPU instructions, but this is only partially true. Like many interpreted languages, Python compiles source code to a set of instructions for a virtual machine. Then the Python interpreter executes the set of instructions in its internal virtual machine. This intermediate format is called "bytecode." It is possible to generate this bytecode version of your program before uploading it into your device.
+
+By compiling your code beforehand, your computer will do syntax check instead of the microcontroller. Uploading a compiled version of your code will save memory on your microcontroller.  It is especially useful on a small microcontroller with a limited amount of memory.
+
+The bytecode version of your program has the `.mpy` file extension. Upload this file instead of the file ending with `.py`.
+
+I compile my python code into bytecode using the micropython cross compiler, using the following command:
+
+
+    mpy-cross espsensor.py
+
+For more information on micropython, see the project GitHub repository at https://github.com/micropython/micropython
+
+
 ## Misc
 
 Links for more information on the tools I am using:
@@ -104,6 +120,6 @@ The live dashboard on adafruit.io:
 
   - https://io.adafruit.com/W6BSD/dashboards/esp12
 
-More info on that project:
+### More info on that project:
 
   - https://0x9900.com/esp8266-environment-sensor/
