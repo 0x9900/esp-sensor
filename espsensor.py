@@ -1,5 +1,3 @@
-import bme280
-
 
 import json
 import logging
@@ -18,9 +16,12 @@ from machine import unique_id
 from ubinascii import hexlify
 from umqtt.robust import MQTTClient
 
+import bme280
+
 WIDTH = 128
 HEIGHT = 64
 TOPIC = bytes('/'.join([wc.IO_USERNAME, 'feeds/esp12_{:s}']), 'utf-8')
+SAMPLING = 60
 
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger("ESP32")
@@ -56,7 +57,7 @@ class Network:
       time.sleep(.5)
     else:
       LOG.info('Could not connect to the WiFi network')
-      raise IOError('Network connection error')
+      raise OSError('Network connection error')
 
   def isconnected(self):
     return self.sta_if.isconnected()
@@ -79,20 +80,22 @@ async def heartbeat():
 
 class Sensor:
   def __init__(self, i2c):
-    self._bme = bme280.BME280(i2c=i2c)
-    self._bme.oversample = 2
-    self._bme.sealevel = 101225
+    self.sensor = bme280.BME280(i2c=i2c)
+    self.sensor.set_measurement_settings({
+      'filter': bme280.BME280_FILTER_COEFF_16,
+      'standby_time': bme280.BME280_STANDBY_TIME_500_US,
+      'osr_h': bme280.BME280_OVERSAMPLING_1X,
+      'osr_p': bme280.BME280_OVERSAMPLING_16X,
+      'osr_t': bme280.BME280_OVERSAMPLING_2X})
+    self.sensor.set_power_mode(bme280.BME280_NORMAL_MODE)
 
-  def fields(self):
-    return ['temp', 'humidity', 'pressure']
-
-  def to_dict(self):
-    return dict(temp=self._bme.temperature, humidity=self._bme.humidity,
-                pressure=self._bme.pressure)
+  def get(self):
+    data = self.sensor.get_measurement()
+    data['temp'] = data.pop('temperature')
+    return data
 
   def to_json(self):
-    return bytes(json.dumps(self.to_dict()), 'utf-8')
-
+    return bytes(json.dumps(self.get), 'utf-8')
 
 class MQTTData:
 
@@ -100,13 +103,20 @@ class MQTTData:
     client_id = hexlify(unique_id()).upper()
     self.client = MQTTClient(client_id=client_id, server=server, user=user, password=password,
                              ssl=False)
-    self.client.set_callback(MQTTData.buttons_cb)
-    mqtt_buttons = TOPIC.format('btn')
-    mqtt_buttons_get = bytes('{:s}/get'.format(mqtt_buttons), 'utf-8')
-
+    self.client.set_callback(self.buttons_cb)
     self.connect()
-    self.client.subscribe(mqtt_buttons)
-    self.client.publish(mqtt_buttons_get, '\0')
+    # Subscribe to topics
+    for topic in ['btn', 'sampling']:
+      mqtt_button = TOPIC.format(topic)
+      self.client.subscribe(mqtt_button)
+
+    # mqtt_button_get = bytes('{:s}/get'.format(mqtt_buttons), 'utf-8')
+    # self.client.publish(mqtt_buttons_get, '\0')
+
+    self.sampling = SAMPLING
+    mqtt_sampling = TOPIC.format(bytes('sampling', 'utf-8'))
+    self.client.publish(mqtt_sampling, bytes(str(self.sampling), 'utf-8'))
+
 
   def connect(self):
     self.client.connect()
@@ -120,28 +130,27 @@ class MQTTData:
       self.client.check_msg()
       await asyncio.sleep_ms(5000)
 
-  def publish(self, sensor):
-    LOG.debug('MQTT publish')
-    LOG.debug("MQTT sensor data %r", sensor.to_dict())
-    for key, value in sensor.to_dict().items():
-      topic = TOPIC.format(bytes(key, 'utf-8'))
-      self.client.publish(topic, bytes(str(value), 'utf-8'))
-
-  @staticmethod
-  def buttons_cb(topic, value):
+  def buttons_cb(self, topic, value):
     LOG.info('Button pressed: %s %s', topic.decode(), value.decode())
-    if value == b'reset':
+    if topic == b'W6BSD/feeds/esp12_sampling':
+      self.sampling = int(value)
+    elif topic == b'W6BSD/feeds/esp12_btn' and value == b'reset':
       reset()
 
   async def run(self, sensor):
     while True:
       try:
-        self.publish(sensor)
+        data = sensor.get()
+        for key, value in data.items():
+          topic = TOPIC.format(bytes(key, 'utf-8'))
+          self.client.publish(topic, bytes(str(value), 'utf-8'))
+          LOG.debug('Publishing: (%s, %f)', key, value)
       except OSError as exc:
         LOG.error('MQTT %s %s', type(exc).__name__, exc)
         await asyncio.sleep_ms(750)
       else:
-        await asyncio.sleep(30)
+        LOG.debug("Sampling time: %d", self.sampling)
+        await asyncio.sleep(self.sampling)
 
 class DisplayData:
 
@@ -151,12 +160,13 @@ class DisplayData:
   async def run(self, sensor):
     network = Network()
     while True:
+      data = sensor.get()
       self.scr.fill(0)
-      data = sensor.to_dict()
       LOG.debug('DisplayData %r', data)
-      for idx, field in enumerate(sensor.fields()):
-        line = "{}: {:.1f}".format(field, data[field])
-        self.scr.text(line, 0, 5 + idx * 13)
+      for idx, key in enumerate(['temp', 'humidity', 'pressure']):
+        line = "{}: {:.1f}".format(key, data[key])
+        self.scr.text(line, 0, 7 + idx * 13)
+
       self.scr.hline(0, 51, WIDTH, 1)
       if network.isconnected():
         self.scr.text(network.ipaddr(), 0, 53)
@@ -183,7 +193,7 @@ def main():
   try:
     network = Network()
     network.connect(wc.SSID, wc.PASSWORD)
-  except IOError as err:
+  except OSError as err:
     oled.fill(0)
     oled.text('WiFi ERROR', 20, 35)
     oled.show()

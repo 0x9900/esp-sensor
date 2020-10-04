@@ -1,7 +1,6 @@
 #
 # Verify if some packages are installed. Install the packages if they are missing and then reboot.
 # So far the only required package is logging.
-
 try:
   import logging
 except ImportError:
@@ -22,8 +21,3 @@ except ImportError:
   install('Logging')
   sleep(3)
   reset()
-
-def no_debug():
-  # this can be run from the REPL as well
-  import esp
-  esp.osdebug(None)
