@@ -103,3 +103,7 @@ Links for more information on the tools I am using:
 The live dashboard on adafruit.io:
 
   - https://io.adafruit.com/W6BSD/dashboards/esp12
+
+More info on that project:
+
+  - https://0x9900.com/esp8266-environment-sensor/
