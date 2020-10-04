@@ -11,6 +11,7 @@ import wificonfig as wc
 
 from machine import I2C
 from machine import Pin
+from machine import WDT
 from machine import reset
 from machine import unique_id
 from ubinascii import hexlify
@@ -72,11 +73,14 @@ class Network:
 async def heartbeat():
   speed = 125
   led = Pin(2, Pin.OUT)
+  wdt = WDT()
   while True:
     led(0)
+    wdt.feed()
     await asyncio.sleep_ms(speed)
     led(1)
-    await asyncio.sleep_ms(speed*64)
+    wdt.feed()
+    await asyncio.sleep_ms(speed * 10)
 
 class Sensor:
   def __init__(self, i2c):
@@ -208,10 +212,10 @@ def main():
   display = DisplayData(oled)
 
   loop = asyncio.get_event_loop()
-  loop.create_task(heartbeat())
   loop.create_task(display.run(sensor))
   loop.create_task(publisher.run(sensor))
   loop.create_task(publisher.check_msg())
+  loop.create_task(heartbeat())
 
   try:
     loop.run_forever()
