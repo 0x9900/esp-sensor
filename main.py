@@ -12,7 +12,7 @@ except ImportError:
 else:
   try:
     espsensor.main()
-  except OSError as exc:
+  except Exception as exc:
     print(exc)
     time.sleep(120)
     machine.reset()
