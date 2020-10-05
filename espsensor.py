@@ -28,7 +28,7 @@ HEIGHT = 64
 TOPIC = bytes('/'.join([wc.IO_USERNAME, 'feeds/esp12_{:s}']), 'utf-8')
 SAMPLING = 60
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("ESP32")
 
 class Network:
