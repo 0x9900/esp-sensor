@@ -1,14 +1,14 @@
 #
 # Verify if some packages are installed. Install the packages if they are missing and then reboot.
 # So far the only required package is logging.
+import machine
+from time import sleep
+
 try:
   import logging
 except ImportError:
   import network
   import wificonfig as wc
-
-  from machine import reset
-  from time import sleep
   from upip import install
 
   network.WLAN(network.AP_IF).active(False)
@@ -20,4 +20,4 @@ except ImportError:
   print('Network config:', sta_if.ifconfig())
   install('Logging')
   sleep(3)
-  reset()
+  machine.reset()
