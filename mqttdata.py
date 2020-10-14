@@ -19,8 +19,7 @@ class MQTTData:
     self.topic = bytes('/'.join([user, 'feeds/{}_{{:s}}'.format(sname)]), 'utf-8')
 
     client_id = hexlify(unique_id()).upper()
-    self.client = MQTTClient(client_id=client_id, server=server, user=user, password=password,
-                             ssl=False)
+    self.client = MQTTClient(client_id, server, user=user, password=password)
     self.client.set_callback(self.buttons_cb)
     self.client.connect()
     # Subscribe to topics

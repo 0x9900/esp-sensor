@@ -2,7 +2,7 @@
 *~
 *.pyc
 *.mpy
-wificonfig.py
+config.py
 /pexec.egg-info/
 /build/
 /dist/
