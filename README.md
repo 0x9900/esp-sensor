@@ -105,8 +105,10 @@ The bytecode version of your program has the `.mpy` file extension. Upload this 
 
 I compile my python code into bytecode using the micropython cross compiler, using the following command:
 
+    mpy-cross mqttdata.py
+	mpy-cross aqi.py
 
-    mpy-cross espsensor.py
+Then, I only upload the compiled version of these files on my micro-controller.
 
 For more information on micropython, see the project GitHub repository at https://github.com/micropython/micropython
 
