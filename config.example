@@ -1,0 +1,19 @@
+#
+# Edit this file and rename it into wificonfig.py
+#
+SSID='<wifi ssid>'
+PASSWORD='<wifi password>'
+
+# Adafruit.io MQTT broaker
+IO_USERNAME = '<User Name>'
+IO_URL = 'io.adafruit.com'
+IO_KEY = '<Your API Key>'
+
+# MQTT stream name
+SNAME = "esp12"
+
+# Weather bit (https://www.weatherbit.io)
+# For the air quality information
+WB_KEY = "<Your API Key>"
+WB_LAT = 37.454822
+WB_LON = -122.253519

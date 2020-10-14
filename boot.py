@@ -8,7 +8,7 @@ try:
   import logging
 except ImportError:
   import network
-  import wificonfig as wc
+  import config as wc
   from upip import install
 
   network.WLAN(network.AP_IF).active(False)
@@ -18,6 +18,6 @@ except ImportError:
   while not sta_if.isconnected():
     sleep(1)
   print('Network config:', sta_if.ifconfig())
-  install('Logging')
-  sleep(3)
+  install('logging')
+  sleep(20)
   machine.reset()

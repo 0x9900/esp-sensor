@@ -1,9 +1,0 @@
-#
-# Edit this file and rename it into wificonfig.py
-#
-SSID='<wifi ssid>'
-PASSWORD='<wifi password>'
-
-IO_URL = 'io.adafruit.com'
-IO_USERNAME = '<User Name>'
-IO_KEY = '<Your API Key>'

@@ -15,22 +15,27 @@ This project has been developed using the programming language Python, or to be 
 
 Once the microcontroller is running micropython, you can install the esp-sensor's files.
 
-Edit and enter your credentials into the file `wificonfig.sample` and save it into `wificonfig.py`.
+Edit and enter your credentials into the file `config.example` and save it into `config.py`.
 
 ### Install the library into the ESP8266
+
+The port `/dev/cu.wchusbserial110` correspond to the USB port on my Mac. The name will be different on Linux or Windows.
 
 ```
 ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 mkdir lib
 ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put lib/bme280.py lib/bme280.py
+ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put lib/logging.py lib/logging.py
 ```
 
 ### Install the rest of the files
 
 ```
-ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put wificonfig.py
-ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put espsensor.py
 ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put main.py
-ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put boot.py
+ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put aqi.py
+ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put config.py
+ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put mqttdata.py
+ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put sensor.py
+ampy -d 1 --port /dev/cu.wchusbserial110 -b 115200 put tools.py
 ```
 
 ## Running
