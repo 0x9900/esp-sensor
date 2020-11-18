@@ -51,7 +51,7 @@ class AQI:
       response = req.json()
       data = response['data'][0]
     else:
-      LOG.err('Error: %s', str(req.status_code))
+      LOG.error('Error: %s', str(req.status_code))
     req.close()
 
     gc.collect()
