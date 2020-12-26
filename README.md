@@ -87,8 +87,8 @@ INFO:ESP32:Could not connect to the WiFi network
 
 ## Picture of the prototype and the final version
 
-<img src="images/prototype.jpg"  width="250" height="250" />
-<img src="images/final.jpg" width="250" height="250" />
+<img src="images/prototype.jpg"  width="450" height="450" />
+<img src="images/final.jpg" width="450" height="450" />
 
 ## Dashboard
 
